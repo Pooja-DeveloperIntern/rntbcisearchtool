@@ -25,6 +25,19 @@ export async function registerRoutes(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
+      // Check for duplicate file by original name and size
+      const existingFiles = await storage.getAllFiles();
+      const isDuplicate = existingFiles.some(f => 
+        f.originalName === req.file!.originalname && 
+        fs.statSync(req.file!.path).size === fs.statSync(f.path).size
+      );
+
+      if (isDuplicate) {
+        // Remove the temporary uploaded file
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: "This file has already been uploaded" });
+      }
+
       const fileRecord = await storage.createFile({
         filename: req.file.filename,
         originalName: req.file.originalname,
