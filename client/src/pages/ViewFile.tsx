@@ -147,7 +147,7 @@ export default function ViewFile() {
                         const cellValue = row[colIndex];
                         const isUrl = String(cellValue).startsWith("http");
                         return (
-                          <td key={colIndex} className="px-6 py-2 text-sm text-foreground border-r border-b border-gray-100 dark:border-gray-800">
+                          <td key={colIndex} className="px-6 py-2 text-sm text-foreground border-r border-b border-gray-100 dark:border-gray-800 break-words min-w-[200px]">
                              {cellValue ? (
                                isUrl ? (
                                  <a 

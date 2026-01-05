@@ -131,10 +131,13 @@ export default function Home() {
         </div>
 
         {/* Search Interface Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 p-6 md:p-8 mb-12 relative overflow-hidden">
+        <div className={`
+          bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 transition-all duration-500 overflow-hidden relative
+          ${queryTerms.length > 0 ? "p-4 md:p-6 mb-6 opacity-90 scale-95" : "p-6 md:p-8 mb-12"}
+        `}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           
-          <div className="relative z-10 flex flex-col md:flex-row gap-4 mb-6">
+          <div className={`relative z-10 flex flex-col md:flex-row gap-4 ${queryTerms.length > 0 ? "mb-4" : "mb-6"}`}>
             <div className="flex-1 flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -145,20 +148,23 @@ export default function Home() {
                     if (e.key === "Enter") addTerm();
                   }}
                   placeholder="Enter a keyword..."
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-transparent focus:border-primary/20 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-200"
+                  className={`
+                    w-full pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-2 border-transparent focus:border-primary/20 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-200
+                    ${queryTerms.length > 0 ? "py-2" : "py-3"}
+                  `}
                 />
               </div>
               <Button 
                 onClick={addTerm}
                 variant="secondary" 
-                className="rounded-xl px-5"
+                className={`rounded-xl px-5 ${queryTerms.length > 0 ? "h-10" : "h-12"}`}
               >
                 <Plus className="h-5 w-5 mr-1" /> Add
               </Button>
             </div>
             <Button 
               onClick={handleSearch}
-              size="lg"
+              size={queryTerms.length > 0 ? "default" : "lg"}
               className="md:w-auto w-full rounded-xl text-base font-semibold"
             >
               Search All Terms
@@ -166,7 +172,7 @@ export default function Home() {
           </div>
 
           {/* Active Tags Area */}
-          <div className="flex flex-wrap gap-2 min-h-[40px]">
+          <div className="flex flex-wrap gap-2 min-h-[30px]">
             <AnimatePresence>
               {activeTerms.length === 0 && (
                 <span className="text-muted-foreground italic text-sm py-2">No search terms added yet...</span>

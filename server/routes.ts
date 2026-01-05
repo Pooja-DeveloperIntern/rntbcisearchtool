@@ -57,8 +57,18 @@ export async function registerRoutes(
           // Clean up undefined/nulls for search text
           const cleanRow = rowData.map(cell => {
             if (cell === null || cell === undefined) return "";
-            // Handle SheetJS Date objects if any
+            
+            // Handle SheetJS Date objects or numbers that represent Excel dates
             if (cell instanceof Date) return cell.toLocaleDateString();
+            
+            // Handle numeric cells that might be Excel dates (between 1900 and 2100 years usually)
+            if (typeof cell === 'number' && cell > 20000 && cell < 60000) {
+              try {
+                const date = xlsx.utils.format_cell({ v: cell, t: 'n', z: 'mm/dd/yy' });
+                if (date && date.includes('/')) return date;
+              } catch (e) {}
+            }
+            
             return String(cell);
           });
           const searchText = cleanRow.join(" ").toLowerCase();
