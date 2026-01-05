@@ -55,7 +55,12 @@ export async function registerRoutes(
         jsonData.forEach((rowData, index) => {
           // Convert row data to simple array of values
           // Clean up undefined/nulls for search text
-          const cleanRow = rowData.map(cell => cell === null || cell === undefined ? "" : String(cell));
+          const cleanRow = rowData.map(cell => {
+            if (cell === null || cell === undefined) return "";
+            // Handle SheetJS Date objects if any
+            if (cell instanceof Date) return cell.toLocaleDateString();
+            return String(cell);
+          });
           const searchText = cleanRow.join(" ").toLowerCase();
 
           if (searchText.trim()) { // Only index non-empty rows
@@ -63,7 +68,7 @@ export async function registerRoutes(
               fileId: fileRecord.id,
               sheetName: sheetName,
               rowNumber: index + 1, // 1-based index for user friendliness
-              data: rowData,
+              data: cleanRow, // Store cleaned string values instead of raw data
               searchText: searchText
             });
           }

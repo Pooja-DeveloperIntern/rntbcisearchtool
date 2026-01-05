@@ -297,18 +297,13 @@ export default function Home() {
                           </td>
                           <td className="px-4 py-4">
                             <div className="flex flex-wrap gap-2">
-                              {result.data.slice(0, 3).map((cell: any, i: number) => {
-                                if (!cell) return null;
-                                return (
-                                  <div key={i} className="bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-100 dark:border-gray-800 max-w-[200px] truncate">
-                                    <Highlighter 
-                                      text={String(cell)} 
-                                      terms={queryTerms} 
-                                      className="font-medium"
-                                    />
-                                  </div>
-                                )
-                              })}
+                              <div className="bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-100 dark:border-gray-800">
+                                <Highlighter 
+                                  text={result.data.filter((cell: any) => cell).join(" | ")} 
+                                  terms={queryTerms} 
+                                  className="font-medium"
+                                />
+                              </div>
                             </div>
                           </td>
                           <td className="px-4 py-4 text-right">

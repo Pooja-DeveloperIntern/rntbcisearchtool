@@ -48,7 +48,7 @@ export class DatabaseStorage implements IStorage {
         rowNumber: rows.rowNumber,
         data: rows.data,
         searchText: rows.searchText,
-        filename: files.filename
+        filename: files.originalName // Use originalName instead of filename
       })
       .from(rows)
       .innerJoin(files, eq(rows.fileId, files.id))
