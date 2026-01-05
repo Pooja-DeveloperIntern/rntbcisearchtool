@@ -115,220 +115,225 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950/50">
+    <div className="flex flex-col h-screen bg-gray-50/50 dark:bg-gray-950/50 overflow-hidden">
       <Header />
       
-      <main className="container max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
-            Search Inside Your Excel Files
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Upload your spreadsheets and instantly find rows matching multiple criteria.
-            Simple, fast, and powerful.
-          </p>
-        </div>
+      <main className="flex-1 flex flex-col min-h-0 container max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div className="shrink-0">
+          {/* Hero Section - Only show when no search active */}
+          {queryTerms.length === 0 && (
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-3 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+                Search Inside Your Excel Files
+              </h1>
+              <p className="text-base text-muted-foreground max-w-xl mx-auto">
+                Upload your spreadsheets and instantly find rows matching multiple criteria.
+              </p>
+            </div>
+          )}
 
-        {/* Search Interface Card */}
-        <div className={`
-          bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 transition-all duration-500 overflow-hidden relative
-          ${queryTerms.length > 0 ? "p-4 md:p-6 mb-6 opacity-90 scale-95" : "p-6 md:p-8 mb-12"}
-        `}>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          
-          <div className={`relative z-10 flex flex-col md:flex-row gap-4 ${queryTerms.length > 0 ? "mb-4" : "mb-6"}`}>
-            <div className="flex-1 flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") addTerm();
-                  }}
-                  placeholder="Enter a keyword..."
-                  className={`
-                    w-full pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-2 border-transparent focus:border-primary/20 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-200
-                    ${queryTerms.length > 0 ? "py-2" : "py-3"}
-                  `}
-                />
+          {/* Search Interface Card */}
+          <div className={`
+            bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800 transition-all duration-500 overflow-hidden relative
+            ${queryTerms.length > 0 ? "p-3 md:p-4 mb-4 opacity-100 scale-100" : "p-6 md:p-8 mb-8"}
+          `}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            
+            <div className={`relative z-10 flex flex-col md:flex-row gap-3 ${queryTerms.length > 0 ? "mb-2" : "mb-6"}`}>
+              <div className="flex-1 flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") addTerm();
+                    }}
+                    placeholder="Enter a keyword..."
+                    className={`
+                      w-full pl-9 pr-4 bg-gray-50 dark:bg-gray-800 border-2 border-transparent focus:border-primary/20 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-200
+                      ${queryTerms.length > 0 ? "py-1.5 text-sm" : "py-3"}
+                    `}
+                  />
+                </div>
+                <Button 
+                  onClick={addTerm}
+                  variant="secondary" 
+                  className={`rounded-xl px-4 ${queryTerms.length > 0 ? "h-9 text-sm" : "h-12"}`}
+                >
+                  <Plus className="h-4 w-4 mr-1" /> Add
+                </Button>
               </div>
               <Button 
-                onClick={addTerm}
-                variant="secondary" 
-                className={`rounded-xl px-5 ${queryTerms.length > 0 ? "h-10" : "h-12"}`}
+                onClick={handleSearch}
+                size={queryTerms.length > 0 ? "sm" : "lg"}
+                className="md:w-auto w-full rounded-xl text-sm font-semibold"
               >
-                <Plus className="h-5 w-5 mr-1" /> Add
+                Search All Terms
               </Button>
             </div>
-            <Button 
-              onClick={handleSearch}
-              size={queryTerms.length > 0 ? "default" : "lg"}
-              className="md:w-auto w-full rounded-xl text-base font-semibold"
-            >
-              Search All Terms
-            </Button>
-          </div>
 
-          {/* Active Tags Area */}
-          <div className="flex flex-wrap gap-2 min-h-[30px]">
-            <AnimatePresence>
-              {activeTerms.length === 0 && (
-                <span className="text-muted-foreground italic text-sm py-2">No search terms added yet...</span>
-              )}
-              {activeTerms.map(term => (
-                <motion.div
-                  key={term}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className={`
-                    flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-lg border transition-all select-none
-                    ${checkedTerms.has(term) 
-                      ? "bg-primary/10 border-primary/20 text-primary" 
-                      : "bg-gray-100 dark:bg-gray-800 border-transparent text-muted-foreground"
-                    }
-                  `}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checkedTerms.has(term)}
-                    onChange={() => toggleTerm(term)}
-                    className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
-                  />
-                  <span className="font-medium text-sm">{term}</span>
-                  <button 
-                    onClick={() => removeTerm(term)}
-                    className="ml-1 p-0.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+            {/* Active Tags Area */}
+            <div className="flex flex-wrap gap-1.5 min-h-[20px]">
+              <AnimatePresence>
+                {activeTerms.length === 0 && queryTerms.length === 0 && (
+                  <span className="text-muted-foreground italic text-xs py-1">No search terms added yet...</span>
+                )}
+                {activeTerms.map(term => (
+                  <motion.div
+                    key={term}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className={`
+                      flex items-center gap-1.5 pl-2 pr-1.5 py-1 rounded-lg border transition-all select-none
+                      ${checkedTerms.has(term) 
+                        ? "bg-primary/10 border-primary/20 text-primary" 
+                        : "bg-gray-100 dark:bg-gray-800 border-transparent text-muted-foreground"
+                      }
+                    `}
                   >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        <FileUploader />
-
-        {/* Dashboard: List of Uploaded Files */}
-        <div className="mt-12 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Uploaded Files</h2>
-          {isLoadingFiles ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
-            </div>
-          ) : uploadedFiles && uploadedFiles.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {uploadedFiles.map(file => (
-                <div key={file.id} className="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/50 flex flex-col gap-3 group relative overflow-hidden transition-all hover:border-primary/20 hover:bg-white dark:hover:bg-gray-900">
-                  <div className="flex items-start gap-3">
-                    <FileText className="h-8 w-8 text-primary/70 shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm" title={file.originalName}>{file.originalName}</p>
-                      <p className="text-xs text-muted-foreground">Uploaded {new Date(file.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
-                    <Link href={`/view/${file.id}`} className="flex-1">
-                      <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8">
-                        <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                        Open
-                      </Button>
-                    </Link>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={(e) => handleDelete(e, file.id)}
-                      disabled={deleteFileMutation.isPending}
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10 text-xs h-8"
+                    <input
+                      type="checkbox"
+                      checked={checkedTerms.has(term)}
+                      onChange={() => toggleTerm(term)}
+                      className="rounded border-gray-300 text-primary focus:ring-primary h-3 w-3"
+                    />
+                    <span className="font-medium text-xs">{term}</span>
+                    <button 
+                      onClick={() => removeTerm(term)}
+                      className="ml-0.5 p-0.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
                     >
-                      <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                      <X className="h-3 w-3" />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
-          ) : (
-            <p className="text-muted-foreground italic">No files uploaded yet.</p>
+          </div>
+
+          {queryTerms.length === 0 && <FileUploader />}
+
+          {/* Dashboard: List of Uploaded Files - Minimized when results shown */}
+          {queryTerms.length === 0 && (
+            <div className="mt-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 p-6 md:p-8">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Uploaded Files</h2>
+              {isLoadingFiles ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+                </div>
+              ) : uploadedFiles && uploadedFiles.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {uploadedFiles.map(file => (
+                    <div key={file.id} className="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/50 flex flex-col gap-3 group relative overflow-hidden transition-all hover:border-primary/20 hover:bg-white dark:hover:bg-gray-900">
+                      <div className="flex items-start gap-3">
+                        <FileText className="h-8 w-8 text-primary/70 shrink-0" />
+                        <div className="flex-1">
+                          <p className="font-medium text-sm" title={file.originalName}>{file.originalName}</p>
+                          <p className="text-xs text-muted-foreground">Uploaded {new Date(file.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
+                        <Link href={`/view/${file.id}`} className="flex-1">
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8">
+                            <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+                            Open
+                          </Button>
+                        </Link>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={(e) => handleDelete(e, file.id)}
+                          disabled={deleteFileMutation.isPending}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 text-xs h-8"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground italic">No files uploaded yet.</p>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Results Section */}
-        {isSearching && (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-primary/50" />
-          </div>
-        )}
-
-        {queryTerms.length > 0 && results && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-foreground">
-                Search Results <span className="text-muted-foreground font-normal ml-2">({results.length} matches)</span>
-              </h2>
+        {/* Results Section - Scrollable and takes remaining space */}
+        <div className="flex-1 min-h-0 mt-4 overflow-hidden flex flex-col">
+          {isSearching && (
+            <div className="flex justify-center py-12 shrink-0">
+              <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
             </div>
+          )}
 
-            {results.length === 0 ? (
-               <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-2xl border border-dashed">
-                 <p className="text-muted-foreground">No matches found for these terms.</p>
-               </div>
-            ) : (
-              <div className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 dark:bg-gray-800 border-b">
-                      <tr>
-                        <th className="px-4 py-3 font-semibold text-foreground">File Name</th>
-                        <th className="px-4 py-3 font-semibold text-foreground">Sheet</th>
-                        <th className="px-4 py-3 font-semibold text-foreground">Row</th>
-                        <th className="px-4 py-3 font-semibold text-foreground">Matched Content</th>
-                        <th className="px-4 py-3 font-semibold text-foreground text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {results.map((result) => (
-                        <tr key={`${result.fileId}-${result.sheetName}-${result.rowNumber}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                          <td className="px-4 py-4 font-medium text-foreground">{result.filename}</td>
-                          <td className="px-4 py-4 text-muted-foreground">{result.sheetName}</td>
-                          <td className="px-4 py-4">
-                            <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex flex-wrap gap-2">
-                              <div className="bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-100 dark:border-gray-800">
+          {queryTerms.length > 0 && results && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex-1 flex flex-col min-h-0 space-y-4"
+            >
+              <div className="flex items-center justify-between shrink-0">
+                <h2 className="text-xl font-bold text-foreground">
+                  Search Results <span className="text-muted-foreground font-normal ml-2 text-sm">({results.length} matches)</span>
+                </h2>
+                <Button variant="ghost" size="sm" onClick={() => setQueryTerms([])} className="text-xs h-8">Clear Results</Button>
+              </div>
+
+              {results.length === 0 ? (
+                 <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-2xl border border-dashed shrink-0">
+                   <p className="text-muted-foreground">No matches found for these terms.</p>
+                 </div>
+              ) : (
+                <div className="flex-1 min-h-0 bg-white dark:bg-gray-900 rounded-xl border shadow-sm flex flex-col overflow-hidden">
+                  <div className="flex-1 overflow-auto">
+                    <table className="w-full text-sm text-left border-separate border-spacing-0">
+                      <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+                        <tr>
+                          <th className="px-4 py-3 font-semibold text-foreground border-b">File Name</th>
+                          <th className="px-4 py-3 font-semibold text-foreground border-b">Sheet</th>
+                          <th className="px-4 py-3 font-semibold text-foreground border-b">Row</th>
+                          <th className="px-4 py-3 font-semibold text-foreground border-b w-1/2">Matched Content</th>
+                          <th className="px-4 py-3 font-semibold text-foreground text-right border-b sticky right-0 bg-gray-50 dark:bg-gray-800">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {results.map((result) => (
+                          <tr key={`${result.fileId}-${result.sheetName}-${result.rowNumber}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                            <td className="px-4 py-3 font-medium text-foreground align-top">{result.filename}</td>
+                            <td className="px-4 py-3 text-muted-foreground align-top whitespace-nowrap">{result.sheetName}</td>
+                            <td className="px-4 py-3 align-top">
+                              <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
+                            </td>
+                            <td className="px-4 py-3 align-top">
+                              <div className="bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded border border-gray-100 dark:border-gray-800 text-sm leading-relaxed">
                                 <Highlighter 
-                                  text={result.data.filter((cell: any) => cell).join(" | ")} 
+                                  text={result.data.filter((cell: any) => cell !== null && cell !== undefined).join(" | ")} 
                                   terms={queryTerms} 
-                                  className="font-medium"
                                 />
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 text-right">
-                            <Link href={`/view/${result.fileId}?sheet=${encodeURIComponent(result.sheetName)}&row=${result.rowNumber}&terms=${encodeURIComponent(JSON.stringify(queryTerms))}`}>
-                              <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-colors">
-                                View
-                                <ArrowRight className="ml-2 h-3.5 w-3.5" />
-                              </Button>
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            </td>
+                            <td className="px-4 py-3 text-right align-top sticky right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+                              <Link href={`/view/${result.fileId}?sheet=${encodeURIComponent(result.sheetName)}&row=${result.rowNumber}&terms=${encodeURIComponent(JSON.stringify(queryTerms))}`}>
+                                <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm">
+                                  View
+                                  <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                                </Button>
+                              </Link>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            )}
-          </motion.div>
-        )}
+              )}
+            </motion.div>
+          )}
+        </div>
       </main>
     </div>
   );

@@ -49,27 +49,18 @@ export async function registerRoutes(
 
       for (const sheetName of workbook.SheetNames) {
         const sheet = workbook.Sheets[sheetName];
-        // Parse sheet to JSON array of arrays
-        const jsonData = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+        // Parse sheet to JSON array of arrays with raw: false to get formatted values
+        const jsonData = xlsx.utils.sheet_to_json(sheet, { 
+          header: 1, 
+          raw: false, // Ensure we get formatted strings (dates, numbers with decimals as seen in Excel)
+          defval: "" 
+        }) as any[][];
 
         jsonData.forEach((rowData, index) => {
-          // Convert row data to simple array of values
           // Clean up undefined/nulls for search text
           const cleanRow = rowData.map(cell => {
             if (cell === null || cell === undefined) return "";
-            
-            // Handle SheetJS Date objects or numbers that represent Excel dates
-            if (cell instanceof Date) return cell.toLocaleDateString();
-            
-            // Handle numeric cells that might be Excel dates (between 1900 and 2100 years usually)
-            if (typeof cell === 'number' && cell > 20000 && cell < 60000) {
-              try {
-                const date = xlsx.utils.format_cell({ v: cell, t: 'n', z: 'mm/dd/yy' });
-                if (date && date.includes('/')) return date;
-              } catch (e) {}
-            }
-            
-            return String(cell);
+            return String(cell).trim();
           });
           const searchText = cleanRow.join(" ").toLowerCase();
 
@@ -78,7 +69,7 @@ export async function registerRoutes(
               fileId: fileRecord.id,
               sheetName: sheetName,
               rowNumber: index + 1, // 1-based index for user friendliness
-              data: cleanRow, // Store cleaned string values instead of raw data
+              data: cleanRow, // Store cleaned formatted values
               searchText: searchText
             });
           }
