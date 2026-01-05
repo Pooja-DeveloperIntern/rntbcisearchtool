@@ -41,6 +41,18 @@ export function useFile(id: number) {
   });
 }
 
+export function useFiles() {
+  return useQuery({
+    queryKey: [api.files.list.path],
+    queryFn: async () => {
+      const res = await fetch(api.files.list.path, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch files");
+      const data = await res.json();
+      return api.files.list.responses[200].parse(data);
+    },
+  });
+}
+
 export function useUploadFile() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -65,6 +77,7 @@ export function useUploadFile() {
     // Invalidate search results as new data might match existing searches
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.files.search.path] });
+      queryClient.invalidateQueries({ queryKey: [api.files.list.path] });
     },
   });
 }

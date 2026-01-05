@@ -92,6 +92,21 @@ export async function registerRoutes(
     }
   });
 
+  app.get(api.files.list.path, async (req, res) => {
+    try {
+      const files = await storage.getAllFiles();
+      res.json(files.map(f => ({
+        id: f.id,
+        filename: f.filename,
+        originalName: f.originalName,
+        createdAt: f.createdAt?.toISOString() || new Date().toISOString()
+      })));
+    } catch (error) {
+      console.error("List files error:", error);
+      res.status(500).json({ message: "Failed to list files" });
+    }
+  });
+
   app.get(api.files.get.path, async (req, res) => {
     try {
       const id = parseInt(req.params.id);

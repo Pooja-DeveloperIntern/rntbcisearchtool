@@ -4,7 +4,7 @@ import { Plus, X, Search, FileText, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FileUploader } from "@/components/FileUploader";
 import { Header } from "@/components/Header";
-import { useSearchFiles } from "@/hooks/use-files";
+import { useSearchFiles, useFiles } from "@/hooks/use-files";
 import { Highlighter } from "@/components/Highlighter";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -29,7 +29,8 @@ export default function Home() {
   // The actual query sent to the API (only updates on "Search" click)
   const [queryTerms, setQueryTerms] = useState<string[]>(initialTerms);
 
-  const { data: results, isLoading, isError } = useSearchFiles(queryTerms);
+  const { data: results, isLoading: isSearching, isError } = useSearchFiles(queryTerms);
+  const { data: uploadedFiles, isLoading: isLoadingFiles } = useFiles();
 
   // Sync URL with queryTerms
   useEffect(() => {
@@ -180,8 +181,32 @@ export default function Home() {
 
         <FileUploader />
 
+        {/* Dashboard: List of Uploaded Files */}
+        <div className="mt-12 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 p-6 md:p-8">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Uploaded Files</h2>
+          {isLoadingFiles ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+            </div>
+          ) : uploadedFiles && uploadedFiles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {uploadedFiles.map(file => (
+                <div key={file.id} className="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/50 flex items-center gap-3">
+                  <FileText className="h-8 w-8 text-primary/70" />
+                  <div className="overflow-hidden">
+                    <p className="font-medium text-sm truncate">{file.originalName}</p>
+                    <p className="text-xs text-muted-foreground">Uploaded {new Date(file.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground italic">No files uploaded yet.</p>
+          )}
+        </div>
+
         {/* Results Section */}
-        {isLoading && (
+        {isSearching && (
           <div className="flex justify-center py-20">
             <Loader2 className="h-10 w-10 animate-spin text-primary/50" />
           </div>

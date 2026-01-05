@@ -45,6 +45,19 @@ export const api = {
         404: z.object({ message: z.string() })
       }
     },
+    list: {
+      method: "GET" as const,
+      path: "/api/files",
+      responses: {
+        200: z.array(z.object({
+          id: z.number(),
+          filename: z.string(),
+          originalName: z.string(),
+          createdAt: z.string()
+        })),
+        500: z.object({ message: z.string() })
+      }
+    },
     download: {
       method: "GET" as const,
       path: "/api/files/:id/download",
