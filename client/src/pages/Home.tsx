@@ -219,8 +219,8 @@ export default function Home() {
                 <div key={file.id} className="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/50 flex flex-col gap-3 group relative overflow-hidden transition-all hover:border-primary/20 hover:bg-white dark:hover:bg-gray-900">
                   <div className="flex items-start gap-3">
                     <FileText className="h-8 w-8 text-primary/70 shrink-0" />
-                    <div className="overflow-hidden flex-1">
-                      <p className="font-medium text-sm truncate" title={file.originalName}>{file.originalName}</p>
+                    <div className="flex-1">
+                      <p className="font-medium text-sm" title={file.originalName}>{file.originalName}</p>
                       <p className="text-xs text-muted-foreground">Uploaded {new Date(file.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
