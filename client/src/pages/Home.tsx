@@ -275,30 +275,32 @@ export default function Home() {
                  <p className="text-muted-foreground">No matches found for these terms.</p>
                </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {results.map((result) => (
-                  <div 
-                    key={`${result.fileId}-${result.sheetName}-${result.rowNumber}`}
-                    className="group bg-white dark:bg-gray-900 rounded-xl p-5 border shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <FileText className="h-4 w-4" />
-                          <span className="font-medium text-foreground">{result.filename}</span>
-                          <span>•</span>
-                          <span>{result.sheetName}</span>
-                          <span>•</span>
-                          <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
-                        </div>
-                        
-                        <div className="pt-2">
-                           <div className="flex flex-wrap gap-2 text-sm text-gray-700 dark:text-gray-300">
-                             {/* Preview first few non-empty cells */}
-                             {result.data.slice(0, 5).map((cell: any, i: number) => {
+              <div className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-gray-50 dark:bg-gray-800 border-b">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold text-foreground">File Name</th>
+                        <th className="px-4 py-3 font-semibold text-foreground">Sheet</th>
+                        <th className="px-4 py-3 font-semibold text-foreground">Row</th>
+                        <th className="px-4 py-3 font-semibold text-foreground">Matched Content</th>
+                        <th className="px-4 py-3 font-semibold text-foreground text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {results.map((result) => (
+                        <tr key={`${result.fileId}-${result.sheetName}-${result.rowNumber}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                          <td className="px-4 py-4 font-medium text-foreground">{result.filename}</td>
+                          <td className="px-4 py-4 text-muted-foreground">{result.sheetName}</td>
+                          <td className="px-4 py-4">
+                            <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex flex-wrap gap-2">
+                              {result.data.slice(0, 3).map((cell: any, i: number) => {
                                 if (!cell) return null;
                                 return (
-                                  <div key={i} className="bg-gray-50 dark:bg-gray-800/50 px-3 py-1.5 rounded border border-gray-100 dark:border-gray-800 max-w-xs truncate">
+                                  <div key={i} className="bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-100 dark:border-gray-800 max-w-[200px] truncate">
                                     <Highlighter 
                                       text={String(cell)} 
                                       terms={queryTerms} 
@@ -306,20 +308,22 @@ export default function Home() {
                                     />
                                   </div>
                                 )
-                             })}
-                           </div>
-                        </div>
-                      </div>
-
-                      <Link href={`/view/${result.fileId}?sheet=${encodeURIComponent(result.sheetName)}&row=${result.rowNumber}&terms=${encodeURIComponent(JSON.stringify(queryTerms))}`}>
-                        <Button variant="outline" className="group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
-                          View in File
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                              })}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <Link href={`/view/${result.fileId}?sheet=${encodeURIComponent(result.sheetName)}&row=${result.rowNumber}&terms=${encodeURIComponent(JSON.stringify(queryTerms))}`}>
+                              <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-colors">
+                                View
+                                <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                              </Button>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </motion.div>

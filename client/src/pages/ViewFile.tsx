@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRoute, useSearch, Link } from "wouter";
-import { ArrowLeft, Download, Loader2, Search, Table as TableIcon } from "lucide-react";
+import { ArrowLeft, Download, Loader2, Search, Table as TableIcon, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { useFile } from "@/hooks/use-files";
@@ -145,10 +145,23 @@ export default function ViewFile() {
                     {/* Ensure we map over headers to handle sparse rows correctly, or map row if headers are missing */}
                     {Array.from({ length: Math.max(headers.length, row.length) }).map((_, colIndex) => {
                         const cellValue = row[colIndex];
+                        const isUrl = String(cellValue).startsWith("http");
                         return (
-                          <td key={colIndex} className="px-6 py-2 whitespace-nowrap text-sm text-foreground border-r max-w-xs truncate border-b border-gray-100 dark:border-gray-800">
+                          <td key={colIndex} className="px-6 py-2 text-sm text-foreground border-r border-b border-gray-100 dark:border-gray-800">
                              {cellValue ? (
-                               <Highlighter text={String(cellValue)} terms={terms} />
+                               isUrl ? (
+                                 <a 
+                                   href={String(cellValue)} 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   className="text-primary hover:underline flex items-center gap-1"
+                                 >
+                                   <ExternalLink className="w-3 h-3" />
+                                   {String(cellValue)}
+                                 </a>
+                               ) : (
+                                 <Highlighter text={String(cellValue)} terms={terms} />
+                               )
                              ) : (
                                <span className="text-gray-300 dark:text-gray-700">-</span>
                              )}
