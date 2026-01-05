@@ -277,9 +277,32 @@ export default function Home() {
               className="flex-1 flex flex-col min-h-0 space-y-4"
             >
               <div className="flex items-center justify-between shrink-0">
-                <h2 className="text-xl font-bold text-foreground">
-                  Search Results <span className="text-muted-foreground font-normal ml-2 text-sm">({results.length} matches)</span>
-                </h2>
+                <div className="flex items-baseline gap-2">
+                  <h2 className="text-xl font-bold text-foreground">Search Results</h2>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {queryTerms.map((term, idx) => {
+                      const count = results.filter(r => 
+                        r.searchText.toLowerCase().includes(term.toLowerCase())
+                      ).length;
+                      const colors = [
+                        "text-yellow-600 dark:text-yellow-400",
+                        "text-green-600 dark:text-green-400",
+                        "text-blue-600 dark:text-blue-400",
+                        "text-purple-600 dark:text-purple-400",
+                        "text-pink-600 dark:text-pink-400",
+                        "text-orange-600 dark:text-orange-400",
+                      ];
+                      return (
+                        <span key={term} className={`text-sm font-medium ${colors[idx % colors.length]}`}>
+                          {term}: {count}
+                        </span>
+                      );
+                    })}
+                    <span className="text-muted-foreground text-sm font-normal">
+                      (Total {results.length})
+                    </span>
+                  </div>
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => setQueryTerms([])} className="text-xs h-8">Clear Results</Button>
               </div>
 
