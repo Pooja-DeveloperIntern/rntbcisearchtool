@@ -3,6 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import multer from "multer";
 import * as xlsx from "xlsx";
+
+// Set xlsx to use filesystem
+xlsx.set_fs(fs);
 import path from "path";
 import fs from "fs";
 import { api } from "@shared/routes";
