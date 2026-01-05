@@ -61,6 +61,26 @@ export class DatabaseStorage implements IStorage {
   async getRows(fileId: number): Promise<Row[]> {
     return await db.select().from(rows).where(eq(rows.fileId, fileId)).orderBy(rows.rowNumber);
   }
+
+  async deleteFile(id: number): Promise<void> {
+    const file = await this.getFile(id);
+    if (file) {
+      // 1. Delete rows from DB
+      await db.delete(rows).where(eq(rows.fileId, id));
+      // 2. Delete file record from DB
+      await db.delete(files).where(eq(files.id, id));
+      // 3. Delete physical file if it exists
+      try {
+        import("fs").then(fs => {
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        });
+      } catch (e) {
+        console.error("Failed to delete physical file:", e);
+      }
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

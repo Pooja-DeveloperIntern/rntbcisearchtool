@@ -35,3 +35,5 @@ export interface FileData {
   originalName: string;
   sheets: Record<string, any[][]>;
 }
+
+export type DeleteFileResponse = { message: string };

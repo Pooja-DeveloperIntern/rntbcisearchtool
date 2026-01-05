@@ -162,5 +162,21 @@ export async function registerRoutes(
     }
   });
 
+  app.delete(api.files.delete.path, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const file = await storage.getFile(id);
+      if (!file) {
+        return res.status(404).json({ message: "File not found" });
+      }
+      
+      await storage.deleteFile(id);
+      res.json({ message: "File deleted successfully" });
+    } catch (error) {
+      console.error("Delete error:", error);
+      res.status(500).json({ message: "Delete failed" });
+    }
+  });
+
   return httpServer;
 }

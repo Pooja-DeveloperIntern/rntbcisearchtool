@@ -81,3 +81,27 @@ export function useUploadFile() {
     },
   });
 }
+
+export function useDeleteFile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const url = buildUrl(api.files.delete.path, { id });
+      const res = await fetch(url, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || "Failed to delete file");
+      }
+      
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.files.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.files.search.path] });
+    },
+  });
+}

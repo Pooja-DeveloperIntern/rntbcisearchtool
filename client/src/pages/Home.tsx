@@ -4,11 +4,14 @@ import { Plus, X, Search, FileText, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FileUploader } from "@/components/FileUploader";
 import { Header } from "@/components/Header";
-import { useSearchFiles, useFiles } from "@/hooks/use-files";
+import { useSearchFiles, useFiles, useDeleteFile } from "@/hooks/use-files";
 import { Highlighter } from "@/components/Highlighter";
 import { motion, AnimatePresence } from "framer-motion";
+import { Trash2, ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
+  const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const searchParams = new URLSearchParams(useSearch());
   
@@ -31,6 +34,28 @@ export default function Home() {
 
   const { data: results, isLoading: isSearching, isError } = useSearchFiles(queryTerms);
   const { data: uploadedFiles, isLoading: isLoadingFiles } = useFiles();
+  const deleteFileMutation = useDeleteFile();
+
+  const handleDelete = async (e: React.MouseEvent, id: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (window.confirm("Are you sure you want to delete this file and all its indexed data?")) {
+      try {
+        await deleteFileMutation.mutateAsync(id);
+        toast({
+          title: "File deleted",
+          description: "The file and its search index have been removed.",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete the file.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   // Sync URL with queryTerms
   useEffect(() => {
@@ -191,11 +216,32 @@ export default function Home() {
           ) : uploadedFiles && uploadedFiles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {uploadedFiles.map(file => (
-                <div key={file.id} className="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/50 flex items-center gap-3">
-                  <FileText className="h-8 w-8 text-primary/70" />
-                  <div className="overflow-hidden">
-                    <p className="font-medium text-sm truncate">{file.originalName}</p>
-                    <p className="text-xs text-muted-foreground">Uploaded {new Date(file.createdAt).toLocaleDateString()}</p>
+                <div key={file.id} className="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/50 flex flex-col gap-3 group relative overflow-hidden transition-all hover:border-primary/20 hover:bg-white dark:hover:bg-gray-900">
+                  <div className="flex items-start gap-3">
+                    <FileText className="h-8 w-8 text-primary/70 shrink-0" />
+                    <div className="overflow-hidden flex-1">
+                      <p className="font-medium text-sm truncate" title={file.originalName}>{file.originalName}</p>
+                      <p className="text-xs text-muted-foreground">Uploaded {new Date(file.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
+                    <Link href={`/view/${file.id}`} className="flex-1">
+                      <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8">
+                        <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+                        Open
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={(e) => handleDelete(e, file.id)}
+                      disabled={deleteFileMutation.isPending}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10 text-xs h-8"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
               ))}

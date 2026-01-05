@@ -65,6 +65,15 @@ export const api = {
         // 200 is binary file
         404: z.object({ message: z.string() })
       }
+    },
+    delete: {
+      method: "DELETE" as const,
+      path: "/api/files/:id",
+      responses: {
+        200: z.object({ message: z.string() }),
+        404: z.object({ message: z.string() }),
+        500: z.object({ message: z.string() })
+      }
     }
   }
 };
