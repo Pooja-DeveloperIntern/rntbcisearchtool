@@ -341,7 +341,7 @@ export default function Home() {
                                     cellStr.toLowerCase().includes(term.toLowerCase())
                                   );
 
-                                  const columnName = result.headers && result.headers[i] ? result.headers[i] : `Column ${i + 1}`;
+                                  const columnName = result.headers && result.headers[i] ? result.headers[i] : "";
                                   
                                   return (
                                     <div 
@@ -354,9 +354,11 @@ export default function Home() {
                                         }
                                       `}
                                     >
-                                      <span className="text-[10px] uppercase tracking-wider font-semibold opacity-50 block truncate max-w-[120px]">
-                                        {columnName}
-                                      </span>
+                                      {columnName && (
+                                        <span className="text-[10px] uppercase tracking-wider font-semibold opacity-50 block truncate max-w-[120px]">
+                                          {columnName}
+                                        </span>
+                                      )}
                                       <Highlighter text={cellStr} terms={queryTerms} />
                                     </div>
                                   );
