@@ -319,7 +319,7 @@ export default function Home() {
                           <th className="px-4 py-3 font-semibold text-foreground border-b">File Name</th>
                           <th className="px-4 py-3 font-semibold text-foreground border-b">Sheet</th>
                           <th className="px-4 py-3 font-semibold text-foreground border-b">Row</th>
-                          <th className="px-4 py-3 font-semibold text-foreground border-b w-1/2">Matched Content</th>
+                          <th className="px-4 py-3 font-semibold text-foreground border-b">Content Detail</th>
                           <th className="px-4 py-3 font-semibold text-foreground text-right border-b sticky right-0 bg-gray-50 dark:bg-gray-800">Action</th>
                         </tr>
                       </thead>
@@ -332,11 +332,30 @@ export default function Home() {
                               <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
                             </td>
                             <td className="px-4 py-3 align-top">
-                              <div className="bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded border border-gray-100 dark:border-gray-800 text-sm leading-relaxed">
-                                <Highlighter 
-                                  text={result.data.filter((cell: any) => cell !== null && cell !== undefined).join(" | ")} 
-                                  terms={queryTerms} 
-                                />
+                              <div className="flex flex-wrap gap-2">
+                                {result.data.map((cell: any, i: number) => {
+                                  const cellStr = cell !== null && cell !== undefined ? String(cell).trim() : "";
+                                  if (!cellStr) return null;
+                                  
+                                  const hasMatch = queryTerms.some(term => 
+                                    cellStr.toLowerCase().includes(term.toLowerCase())
+                                  );
+
+                                  return (
+                                    <div 
+                                      key={i} 
+                                      className={`
+                                        px-2 py-1 rounded border text-xs leading-relaxed transition-all
+                                        ${hasMatch 
+                                          ? "bg-white dark:bg-gray-900 border-primary/30 shadow-sm ring-1 ring-primary/10" 
+                                          : "bg-gray-50/50 dark:bg-gray-800/30 border-gray-100 dark:border-gray-800 text-muted-foreground"
+                                        }
+                                      `}
+                                    >
+                                      <Highlighter text={cellStr} terms={queryTerms} />
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </td>
                             <td className="px-4 py-3 text-right align-top sticky right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
