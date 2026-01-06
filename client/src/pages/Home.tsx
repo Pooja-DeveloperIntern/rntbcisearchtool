@@ -62,8 +62,6 @@ export default function Home() {
     if (queryTerms.length > 0) {
       const params = new URLSearchParams();
       params.set("terms", JSON.stringify(queryTerms));
-      // Using history.replaceState to update URL without reloading page
-      // wouter's setLocation triggers navigation, we just want to update URL
       window.history.replaceState(null, "", `?${params.toString()}`);
     } else {
       window.history.replaceState(null, "", "/");
@@ -98,7 +96,6 @@ export default function Home() {
   };
 
   const handleSearch = () => {
-    // Also add the current input if it's not empty
     let termsToSearch = activeTerms.filter(t => checkedTerms.has(t));
     
     if (inputValue.trim()) {
@@ -120,7 +117,6 @@ export default function Home() {
       
       <main className="flex-1 flex flex-col min-h-0 container max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="shrink-0">
-          {/* Hero Section - Only show when no search active */}
           {queryTerms.length === 0 && (
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-3 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
@@ -132,7 +128,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Search Interface Card */}
           <div className={`
             bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800 transition-all duration-500 overflow-hidden relative
             ${queryTerms.length > 0 ? "p-3 md:p-4 mb-4 opacity-100 scale-100" : "p-6 md:p-8 mb-8"}
@@ -173,7 +168,6 @@ export default function Home() {
               </Button>
             </div>
 
-            {/* Active Tags Area */}
             <div className="flex flex-wrap gap-1.5 min-h-[20px]">
               <AnimatePresence>
                 {activeTerms.length === 0 && queryTerms.length === 0 && (
@@ -214,7 +208,6 @@ export default function Home() {
 
           {queryTerms.length === 0 && <FileUploader />}
 
-          {/* Dashboard: List of Uploaded Files - Minimized when results shown */}
           {queryTerms.length === 0 && (
             <div className="mt-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800 p-6 md:p-8">
               <h2 className="text-2xl font-bold text-foreground mb-6">Uploaded Files</h2>
@@ -262,7 +255,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Results Section - Scrollable and takes remaining space */}
         <div className="flex-1 min-h-0 mt-4 overflow-hidden flex flex-col">
           {isSearching && (
             <div className="flex justify-center py-12 shrink-0">
@@ -319,62 +311,76 @@ export default function Home() {
                           <th className="px-4 py-3 font-semibold text-foreground border-b">File Name</th>
                           <th className="px-4 py-3 font-semibold text-foreground border-b">Sheet</th>
                           <th className="px-4 py-3 font-semibold text-foreground border-b">Row</th>
-                          <th className="px-4 py-3 font-semibold text-foreground border-b">Content Detail</th>
+                          <th className="px-4 py-3 font-semibold text-foreground border-b">Matched Content</th>
                           <th className="px-4 py-3 font-semibold text-foreground text-right border-b sticky right-0 bg-gray-50 dark:bg-gray-800">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {results.map((result) => (
-                          <tr key={`${result.fileId}-${result.sheetName}-${result.rowNumber}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                            <td className="px-4 py-3 font-medium text-foreground align-top">{result.filename}</td>
-                            <td className="px-4 py-3 text-muted-foreground align-top whitespace-nowrap">{result.sheetName}</td>
-                            <td className="px-4 py-3 align-top">
-                              <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
-                            </td>
-                            <td className="px-4 py-3 align-top">
-                              <div className="flex flex-wrap gap-2">
-                                {result.data.map((cell: any, i: number) => {
-                                  const cellStr = cell !== null && cell !== undefined ? String(cell).trim() : "";
-                                  if (!cellStr) return null;
-                                  
-                                  const hasMatch = queryTerms.some(term => 
-                                    cellStr.toLowerCase().includes(term.toLowerCase())
-                                  );
+                        {results.map((result) => {
+                          const matchedIndices = result.data.reduce((acc: number[], cell: any, i: number) => {
+                            const cellStr = cell !== null && cell !== undefined ? String(cell).toLowerCase() : "";
+                            if (queryTerms.some(term => cellStr.includes(term.toLowerCase()))) {
+                              acc.push(i);
+                            }
+                            return acc;
+                          }, []);
 
-                                  const columnName = result.headers && result.headers[i] ? result.headers[i] : "";
-                                  
-                                  return (
-                                    <div 
-                                      key={i} 
-                                      className={`
-                                        group relative px-2 py-1 rounded border text-xs leading-relaxed transition-all flex flex-col gap-0.5
-                                        ${hasMatch 
-                                          ? "bg-white dark:bg-gray-900 border-primary/30 shadow-sm ring-1 ring-primary/10" 
-                                          : "bg-gray-50/50 dark:bg-gray-800/30 border-gray-100 dark:border-gray-800 text-muted-foreground"
-                                        }
-                                      `}
-                                    >
-                                      {columnName && (
-                                        <span className="text-[10px] uppercase tracking-wider font-semibold opacity-50 block truncate max-w-[120px]">
-                                          {columnName}
-                                        </span>
-                                      )}
-                                      <Highlighter text={cellStr} terms={queryTerms} />
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right align-top sticky right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-                              <Link href={`/view/${result.fileId}?sheet=${encodeURIComponent(result.sheetName)}&row=${result.rowNumber}&terms=${encodeURIComponent(JSON.stringify(queryTerms))}`}>
-                                <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm">
-                                  View
-                                  <ArrowRight className="ml-2 h-3.5 w-3.5" />
-                                </Button>
-                              </Link>
-                            </td>
-                          </tr>
-                        ))}
+                          return (
+                            <tr key={`${result.fileId}-${result.sheetName}-${result.rowNumber}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                              <td className="px-4 py-3 font-medium text-foreground align-top">{result.filename}</td>
+                              <td className="px-4 py-3 text-muted-foreground align-top whitespace-nowrap">{result.sheetName}</td>
+                              <td className="px-4 py-3 align-top">
+                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Row {result.rowNumber}</span>
+                              </td>
+                              <td className="px-4 py-3 align-top">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                  {result.data.map((cell: any, i: number) => {
+                                    const cellStr = cell !== null && cell !== undefined ? String(cell).trim() : "";
+                                    if (!cellStr) return null;
+                                    
+                                    const hasMatch = queryTerms.some(term => 
+                                      cellStr.toLowerCase().includes(term.toLowerCase())
+                                    );
+
+                                    if (!hasMatch && matchedIndices.length > 0) return null;
+
+                                    const columnName = result.headers && result.headers[i] ? result.headers[i] : "";
+                                    
+                                    return (
+                                      <div 
+                                        key={i} 
+                                        className={`
+                                          group relative px-3 py-2 rounded-xl border text-xs leading-relaxed transition-all flex flex-col gap-1
+                                          ${hasMatch 
+                                            ? "bg-white dark:bg-gray-900 border-primary/40 shadow-md ring-2 ring-primary/5" 
+                                            : "bg-gray-50/50 dark:bg-gray-800/30 border-gray-100 dark:border-gray-800 text-muted-foreground"
+                                          }
+                                        `}
+                                      >
+                                        {columnName && (
+                                          <span className="text-[10px] uppercase tracking-widest font-bold text-primary/70 block truncate mb-1">
+                                            {columnName}
+                                          </span>
+                                        )}
+                                        <div className="font-medium">
+                                          <Highlighter text={cellStr} terms={queryTerms} />
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-right align-top sticky right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+                                <Link href={`/view/${result.fileId}?sheet=${encodeURIComponent(result.sheetName)}&row=${result.rowNumber}&terms=${encodeURIComponent(JSON.stringify(queryTerms))}`}>
+                                  <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm">
+                                    View
+                                    <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                                  </Button>
+                                </Link>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
