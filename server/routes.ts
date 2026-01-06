@@ -52,13 +52,17 @@ export async function registerRoutes(
         // Parse sheet to JSON array of arrays with raw: false to get formatted values
         const jsonData = xlsx.utils.sheet_to_json(sheet, { 
           header: 1, 
-          raw: false, // Ensure we get formatted strings (dates, numbers with decimals as seen in Excel)
+          raw: false, 
           defval: "" 
         }) as any[][];
 
-        // Capture headers (first row)
-        const headers = jsonData.length > 0 ? jsonData[0].map(h => String(h || "").trim()) : [];
+        if (jsonData.length === 0) continue;
 
+        // The first row of the sheet is the headers
+        const headers = jsonData[0].map(h => String(h || "").trim());
+
+        // We start processing from the first row (index 0) because we want to include it in the search 
+        // if it matches, but the user wants these headers to be associated with all subsequent rows.
         jsonData.forEach((rowData, index) => {
           // Clean up undefined/nulls for search text
           const cleanRow = rowData.map(cell => {
@@ -67,14 +71,14 @@ export async function registerRoutes(
           });
           const searchText = cleanRow.join(" ").toLowerCase();
 
-          if (searchText.trim()) { // Only index non-empty rows
+          if (searchText.trim()) { 
             allRows.push({
               fileId: fileRecord.id,
               sheetName: sheetName,
-              rowNumber: index + 1, // 1-based index for user friendliness
-              data: cleanRow, // Store cleaned formatted values
+              rowNumber: index + 1, 
+              data: cleanRow, 
               searchText: searchText,
-              headers: headers // Store headers with each row for easy access in search results
+              headers: headers 
             });
           }
         });
