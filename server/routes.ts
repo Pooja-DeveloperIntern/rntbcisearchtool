@@ -56,6 +56,9 @@ export async function registerRoutes(
           defval: "" 
         }) as any[][];
 
+        // Capture headers (first row)
+        const headers = jsonData.length > 0 ? jsonData[0].map(h => String(h || "").trim()) : [];
+
         jsonData.forEach((rowData, index) => {
           // Clean up undefined/nulls for search text
           const cleanRow = rowData.map(cell => {
@@ -70,7 +73,8 @@ export async function registerRoutes(
               sheetName: sheetName,
               rowNumber: index + 1, // 1-based index for user friendliness
               data: cleanRow, // Store cleaned formatted values
-              searchText: searchText
+              searchText: searchText,
+              headers: headers // Store headers with each row for easy access in search results
             });
           }
         });

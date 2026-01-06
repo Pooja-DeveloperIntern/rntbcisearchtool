@@ -341,17 +341,22 @@ export default function Home() {
                                     cellStr.toLowerCase().includes(term.toLowerCase())
                                   );
 
+                                  const columnName = result.headers && result.headers[i] ? result.headers[i] : `Column ${i + 1}`;
+                                  
                                   return (
                                     <div 
                                       key={i} 
                                       className={`
-                                        px-2 py-1 rounded border text-xs leading-relaxed transition-all
+                                        group relative px-2 py-1 rounded border text-xs leading-relaxed transition-all flex flex-col gap-0.5
                                         ${hasMatch 
                                           ? "bg-white dark:bg-gray-900 border-primary/30 shadow-sm ring-1 ring-primary/10" 
                                           : "bg-gray-50/50 dark:bg-gray-800/30 border-gray-100 dark:border-gray-800 text-muted-foreground"
                                         }
                                       `}
                                     >
+                                      <span className="text-[10px] uppercase tracking-wider font-semibold opacity-50 block truncate max-w-[120px]">
+                                        {columnName}
+                                      </span>
                                       <Highlighter text={cellStr} terms={queryTerms} />
                                     </div>
                                   );

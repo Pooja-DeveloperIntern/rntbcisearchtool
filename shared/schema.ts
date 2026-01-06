@@ -17,6 +17,7 @@ export const rows = pgTable("rows", {
   rowNumber: integer("row_number").notNull(),
   data: jsonb("data").notNull(), // Stores the array of cell values
   searchText: text("search_text").notNull(), // Concatenated text for searching
+  headers: jsonb("headers"), // Store headers with each row
 });
 
 export const insertFileSchema = createInsertSchema(files).omit({ id: true, createdAt: true });
