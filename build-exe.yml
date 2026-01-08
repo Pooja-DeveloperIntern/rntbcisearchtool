@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Build backend (tsx → dist/index.cjs)
+      - name: Build backend (TypeScript → dist/index.cjs)
         run: npm run build
 
       - name: Install pkg
