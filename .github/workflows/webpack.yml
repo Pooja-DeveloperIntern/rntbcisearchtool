@@ -21,18 +21,18 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Install webpack and webpack-cli (no prompt)
-        run: npm install -D webpack webpack-cli
+      - name: Build backend (TypeScript → JS)
+        run: npm run build
+        # this should create server/dist/index.js
 
       - name: Install pkg
         run: npm install -g pkg
 
       - name: Build Windows EXE
-        run: pkg server/index.js --targets win-x64 --output Excel-Insight-Search.exe
+        run: pkg server/dist/index.js --targets win-x64 --output Excel-Insight-Search.exe
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: Excel-Insight-Search
           path: Excel-Insight-Search.exe
-
