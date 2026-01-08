@@ -19,12 +19,15 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
+
+      - name: Install webpack-cli explicitly
+        run: npm install -D webpack webpack-cli
 
       - name: Install pkg
         run: npm install -g pkg
 
-      - name: Build exe
+      - name: Build EXE
         run: pkg server/index.js --targets win-x64 --output Excel-Insight-Search.exe
 
       - name: Upload EXE
